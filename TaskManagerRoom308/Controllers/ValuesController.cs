@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TaskManagerRoom308.DTO.AddNewUser;
+using TaskManagerRoom308.DTO.DeletUser;
 using TaskManagerRoom308.Services;
 
 namespace TaskManagerRoom308.Controllers
@@ -22,8 +23,13 @@ namespace TaskManagerRoom308.Controllers
                 return Ok();
             return BadRequest();
         }
-
-
-
+        [HttpDelete("[action]")]
+        public async Task<IActionResult>DeleteUser([FromQuery]DeletUserCommand command)
+        {
+            var res = await _userService.DeletUser(command);
+            if (res)
+                return Ok();
+            return BadRequest();
+        }
     }
 }

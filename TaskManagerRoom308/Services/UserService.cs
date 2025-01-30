@@ -1,6 +1,8 @@
-﻿using TaskManagerRoom308.Data.Database;
+﻿using Microsoft.EntityFrameworkCore;
+using TaskManagerRoom308.Data.Database;
 using TaskManagerRoom308.Data.Entities;
 using TaskManagerRoom308.DTO.AddNewUser;
+using TaskManagerRoom308.DTO.DeletUser;
 
 namespace TaskManagerRoom308.Services
 {
@@ -27,11 +29,17 @@ namespace TaskManagerRoom308.Services
             await _DbContext.SaveChangesAsync();
             return true;
         }
-
-
-
-
-
+        public async Task<bool>DeletUser(DeletUserCommand command)
+        {
+            var User = await _DbContext.Users.Where(e => e.Id == command.Userid).FirstOrDefaultAsync();
+            if (User is not null)
+            {
+                var USerTasks = await _DbContext.UserTasks.Where(e => e.UserRef == command.Userid).ToListAsync();
+                _DbContext.UserTasks.RemoveRange(USerTasks);
+                _DbContext.Users.Remove(User);
+                await _DbContext.SaveChangesAsync();
+            }
+            return true;
+        }
     }
-
 }
