@@ -23,5 +23,14 @@ namespace TaskManagerRoom308.Controllers
                 return Ok();
             return BadRequest();
         }
+
+
+
+        [HttpGet("[action]")]
+        public async Task<IActionResult> GetAllTasks()
+        {
+            var Result = await _taskService.GetAllTasks();
+            return Ok(Result);
+        }
     }
 }
