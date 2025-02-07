@@ -1,8 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TaskManagerRoom308.Data.Database;
 using TaskManagerRoom308.Data.Entities;
+using TaskManagerRoom308.DTO;
 using TaskManagerRoom308.DTO.AddNewUser;
 using TaskManagerRoom308.DTO.DeletUser;
+using TaskManagerRoom308.DTO.GetAllUser;
 
 namespace TaskManagerRoom308.Services
 {
@@ -14,7 +16,7 @@ namespace TaskManagerRoom308.Services
             _DbContext = dbContext;
         }
 
-        public async Task<bool>addNewUser(addNewUserCommand command)
+        public async Task<bool> addNewUser(addNewUserCommand command)
         {
             var entity = new User
             {
@@ -29,7 +31,7 @@ namespace TaskManagerRoom308.Services
             await _DbContext.SaveChangesAsync();
             return true;
         }
-        public async Task<bool>DeletUser(DeletUserCommand command)
+        public async Task<bool> DeletUser(DeletUserCommand command)
         {
             var User = await _DbContext.Users.Where(e => e.Id == command.Userid).FirstOrDefaultAsync();
             if (User is not null)
@@ -40,6 +42,25 @@ namespace TaskManagerRoom308.Services
                 await _DbContext.SaveChangesAsync();
             }
             return true;
+        }
+        public async Task<ResponseData<List<GetAllUserQr>>> GetAllUser(MetaDataDTO query)
+        {
+            ResponseData<List<GetAllUserQr>> res = new();
+
+            var _queryResult = _DbContext.Users
+                .Select(e => new GetAllUserQr
+                {
+                    UserId = e.Id,
+                    FullName = e.FirstName + " " + e.LastName,
+                    NationalCode = e.NationalCode,
+                    PhoneNumber = e.PhoneNumber,
+                    Email = e.Email
+                }).AsQueryable();
+
+            res.Data = await _queryResult.OrderBy(e => e.UserId).Skip((query.PageNumber - 1) * query.PageSize).Take(query.PageSize).ToListAsync();
+            res.SetValueMetaData(await _queryResult.CountAsync(), query.PageSize, query.PageNumber);
+            return res;
+
         }
     }
 }

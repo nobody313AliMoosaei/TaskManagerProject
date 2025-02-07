@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using TaskManagerRoom308.DTO.AddNewUser;
 using TaskManagerRoom308.DTO.DeletUser;
+using TaskManagerRoom308.DTO.GetAllUser;
 using TaskManagerRoom308.Services;
 
 namespace TaskManagerRoom308.Controllers
@@ -16,7 +17,7 @@ namespace TaskManagerRoom308.Controllers
             _userService = userService;
         }
         [HttpPost("[action]")]
-        public async Task<IActionResult>AddNewUser(addNewUserCommand command)
+        public async Task<IActionResult> AddNewUser(addNewUserCommand command)
         {
             var res = await _userService.addNewUser(command);
             if (res)
@@ -24,12 +25,18 @@ namespace TaskManagerRoom308.Controllers
             return BadRequest();
         }
         [HttpDelete("[action]")]
-        public async Task<IActionResult>DeleteUser([FromQuery]DeletUserCommand command)
+        public async Task<IActionResult> DeleteUser([FromQuery] DeletUserCommand command)
         {
             var res = await _userService.DeletUser(command);
             if (res)
                 return Ok();
             return BadRequest();
+        }
+
+        [HttpGet("[action]")]
+        public async Task<IActionResult> GetUser([FromQuery] MetaDataDTO query)
+        {
+            return Ok(await _userService.GetAllUser(query));
         }
     }
 }
